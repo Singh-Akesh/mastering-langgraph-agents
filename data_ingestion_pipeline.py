@@ -8,7 +8,7 @@ from qdrant_client import QdrantClient
 from email_util import fetch_emails, extract_email_content
 
 # ---------- CONFIG ----------
-BATCH_SIZE = 1 # number of emails to fetch per run
+BATCH_SIZE = 10 # number of emails to fetch per run
 UID_FILE = "last_uid.txt"
 QDRANT_URL = "http://localhost:6333"   # or Qdrant Cloud endpoint
 COLLECTION_NAME = "emails"
@@ -32,7 +32,7 @@ def save_last_uid(uid):
         f.write(str(uid))
 
 
-def chunk_and_embed(docs):
+def chunk_and_embed(docs, uid):
     """Split documents into chunks and create embeddings"""
     # Split into overlapping chunks
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
@@ -45,30 +45,39 @@ def chunk_and_embed(docs):
     for i in range(0, len(texts), 16):
         batch = texts[i:i + 16]
         vectors.extend(embeddings.embed_documents(batch))
-
-        print(f"{len(vectors)} processed out of {len(texts)}")
+        print(f"{len(vectors)} chunks embedded out of {len(texts)} for the email Sequence Id {uid}")
 
     # Return both text chunks and their embeddings (parallel lists)
     return split_docs, vectors
 
-def ingest_into_qdrant(docs, embeddings, uid):
-    """Push chunks into Qdrant with Seq metadata"""
 
+def ingest_into_qdrant(docs, embeddings, uid, batch_size=16):
+    """Push chunks into Qdrant with sequence metadata in batches"""
+
+    # Add email sequence metadata
     for doc in docs:
         doc.metadata["email_seq"] = uid
 
-    points = [
-        PointStruct(
-            id=uid * 1000 + idx,  # uid = email UID, idx = chunk index
-            vector=v,
-            payload={"text": d.page_content, "email_uid": uid}
-        )
-        for idx, (d, v) in enumerate(zip(docs, embeddings))
-    ]
+    total_chunks = len(docs)
+    idx_global = 0  # global index for unique IDs
 
-    # Upsert into collection
-    client.upsert(collection_name=COLLECTION_NAME, points=points)
-    print(f"Ingested {len(docs)} chunks from email Sequence Id {uid}")
+    while idx_global < total_chunks:
+        batch_docs = docs[idx_global: idx_global + batch_size]
+        batch_vectors = embeddings[idx_global: idx_global + batch_size]
+
+        points = [
+            PointStruct(
+                id=uid * 1000 + idx_global + i,  # unique ID per chunk
+                vector=v,
+                payload={"text": d.page_content, "email_uid": uid}
+            )
+            for i, (d, v) in enumerate(zip(batch_docs, batch_vectors))
+        ]
+
+        client.upsert(collection_name=COLLECTION_NAME, points=points)
+        print(f"Upserted chunks ({idx_global + 1}-{idx_global + len(points)}) out of {total_chunks} for email Seq {uid}")
+
+        idx_global += batch_size
 
 
 def main():
@@ -79,7 +88,7 @@ def main():
         content = extract_email_content(msg)
         if not content.strip():
             continue
-        docs, embeddings = chunk_and_embed(content)
+        docs, embeddings = chunk_and_embed(content, uid=seq)
         ingest_into_qdrant(docs, embeddings, uid=seq)
         save_last_uid(seq)  # update after processing
 

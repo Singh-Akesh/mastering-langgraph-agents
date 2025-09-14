@@ -2,7 +2,7 @@ import email
 import imaplib
 import os
 from email.policy import default
-
+from pypdf.errors import FileNotDecryptedError
 # LangChain loaders for attachments
 from langchain_community.document_loaders import (
     PyPDFLoader,
@@ -67,8 +67,10 @@ def extract_email_content(msg):
                 # Handle attachment
                 fname = part.get_filename()
                 data = part.get_payload(decode=True)
+                if not data:
+                    print(f"Skipping empty attachment: {part.get_filename()}")
+                    continue
                 temp_path = f"/tmp/{fname}"
-
                 try:
                     with open(temp_path, "wb") as f:
                         f.write(data)
@@ -85,6 +87,9 @@ def extract_email_content(msg):
 
                     docs = loader.load()
                     texts.extend([d.page_content for d in docs])
+                except FileNotDecryptedError:
+                    print(f"Skipping password-protected PDF: {temp_path}")
+                    continue
                 finally:
                     # Remove the temporary file
                     if os.path.exists(temp_path):

@@ -1,0 +1,17 @@
+[project]
+name = "mastering-langgraph-agents"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "docx>=0.2.4",
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.29",
+    "langchain-ollama>=0.3.8",
+    "langchain-openai>=0.3.33",
+    "langgraph>=0.6.7",
+    "python-docx>=1.2.0",
+    "qdrant-client>=1.15.1",
+    "unstructured>=0.18.14",
+]

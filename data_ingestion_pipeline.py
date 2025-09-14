@@ -8,7 +8,7 @@ from qdrant_client import QdrantClient
 from email_util import fetch_emails, extract_email_content
 
 # ---------- CONFIG ----------
-BATCH_SIZE = 10 # number of emails to fetch per run
+BATCH_SIZE = 1000 # number of emails to fetch per run
 UID_FILE = "last_uid.txt"
 QDRANT_URL = "http://localhost:6333"   # or Qdrant Cloud endpoint
 COLLECTION_NAME = "emails"

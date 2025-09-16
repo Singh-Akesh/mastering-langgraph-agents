@@ -15,7 +15,8 @@ embeddings = OllamaEmbeddings(
 vectorstore = QdrantVectorStore(
     client=client,
     collection_name="emails",
-    embedding=embeddings
+    embedding=embeddings,
+    content_payload_key="text"
 )
 
 # 3️⃣ Retriever

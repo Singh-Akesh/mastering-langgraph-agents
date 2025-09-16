@@ -32,7 +32,16 @@ def count_emails():
     exact_point_count = count_result.count
     print(f"Exact number of points: {exact_point_count}")
 
-if __name__ == '__main__':
-    count_emails()
-    # query_emails()
+def retrieve_point():
+    point_data = client.retrieve(
+        collection_name="emails",
+        ids=[1113000, 162000],
+        with_payload=True,
+        with_vectors=False,
+    )
+    print(point_data)
 
+if __name__ == '__main__':
+    # count_emails()
+    # query_emails()
+    retrieve_point()

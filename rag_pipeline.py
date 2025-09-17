@@ -39,7 +39,7 @@ def rag_query(query: str):
     docs = retriever.invoke(query)
     print("Retrieved from qdrant: ", docs)
     if not docs:
-        return {"answer": "I could not find the information in the emails.", "source_documents": []}
+        return {"answer": "I could not find the information.", "source_documents": []}
 
     context = combine_docs(docs)
     prompt_text = PROMPT_TEMPLATE.format(context=context, question=query)
@@ -57,7 +57,7 @@ def rag_query(query: str):
 
 
 if __name__ == "__main__":
-    q = "How many uber receipts do I have?"
+    q = "Summarize Spectrum residential customer policy?"
     out = rag_query(q)
     print("=== ANSWER ===")
     print(out["answer"])

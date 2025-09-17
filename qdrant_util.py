@@ -1,7 +1,7 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams
 
-COLLECTION_NAME = "emails"
+COLLECTION_NAME = "hackathon_emails"
 VECTOR_SIZE = 768  # dimension of your embeddings
 DISTANCE = "Cosine"  # or "Dot", "Euclid"
 
@@ -42,6 +42,7 @@ def retrieve_point():
     print(point_data)
 
 if __name__ == '__main__':
-    # count_emails()
+    count_emails()
     # query_emails()
-    retrieve_point()
+    # retrieve_point()
+    # create_collection()

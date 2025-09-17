@@ -3,7 +3,7 @@ from langchain_qdrant import QdrantVectorStore
 from langchain_ollama import OllamaEmbeddings, ChatOllama
 from langchain.tools.retriever import create_retriever_tool
 from langchain.chains import RetrievalQA
-from qdrant_util import client
+from qdrant_util import client, COLLECTION_NAME
 
 # 1️⃣ Embeddings
 embeddings = OllamaEmbeddings(
@@ -14,7 +14,7 @@ embeddings = OllamaEmbeddings(
 # 2️⃣ Vectorstore
 vectorstore = QdrantVectorStore(
     client=client,
-    collection_name="emails",
+    collection_name=COLLECTION_NAME,
     embedding=embeddings,
     content_payload_key="text"
 )
@@ -70,14 +70,14 @@ qa_chain = RetrievalQA.from_chain_type(
 
 
 # 7️⃣ Invoke
-query = "Summarize the email I received about Job referral"
-agentResult = agent.invoke(
-    {"messages": [{"role": "user", "content": query}]}
-)
-
-chainResult = qa_chain.invoke({"query": query})
-
-# 8️⃣ Print the result
-print(agentResult)
-print(chainResult)
+# query = "Summarize the email I received about Job referral"
+# agentResult = agent.invoke(
+#     {"messages": [{"role": "user", "content": query}]}
+# )
+#
+# chainResult = qa_chain.invoke({"query": query})
+#
+# # 8️⃣ Print the result
+# print(agentResult)
+# print(chainResult)
 

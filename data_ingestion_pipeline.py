@@ -6,19 +6,20 @@ from qdrant_client.models import PointStruct
 
 from qdrant_client import QdrantClient
 from email_util import fetch_emails, extract_email_content
+from qdrant_util import client, COLLECTION_NAME
 
 # ---------- CONFIG ----------
-BATCH_SIZE = 1000 # number of emails to fetch per run
+BATCH_SIZE = 1 # number of emails to fetch per run
 UID_FILE = "last_uid.txt"
-QDRANT_URL = "http://localhost:6333"   # or Qdrant Cloud endpoint
-COLLECTION_NAME = "emails"
-VECTOR_SIZE = 768  # dimension of your embeddings
-DISTANCE = "Cosine"  # or "Dot", "Euclid"
+# QDRANT_URL = "http://localhost:6333"   # or Qdrant Cloud endpoint
+# COLLECTION_NAME = "emails"
+# VECTOR_SIZE = 768  # dimension of your embeddings
+# DISTANCE = "Cosine"  # or "Dot", "Euclid"
 # ----------------------------
 
 # Initialize Ollama embedding model
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
-client = QdrantClient(url=QDRANT_URL)
+# client = QdrantClient(url=QDRANT_URL)
 
 
 def load_last_uid():

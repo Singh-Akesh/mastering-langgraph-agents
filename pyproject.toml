@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "docx>=0.2.4",
+    "fastapi[standard]>=0.116.2",
     "langchain>=0.3.27",
     "langchain-community>=0.3.29",
     "langchain-ollama>=0.3.8",
